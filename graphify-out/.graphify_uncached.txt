@@ -1,0 +1,9 @@
+D:\1_ai-model\bot3.1\requirements.txt
+D:\1_ai-model\resume_scanner\backend\requirements.txt
+D:\1_ai-model\resume_scanner\frontend\index.html
+D:\1_ai-model\resume_scanner\frontend\README.md
+D:\1_ai-model\resume_scanner\frontend\public\favicon.svg
+D:\1_ai-model\resume_scanner\frontend\public\icons.svg
+D:\1_ai-model\resume_scanner\frontend\src\assets\hero.png
+D:\1_ai-model\resume_scanner\frontend\src\assets\react.svg
+D:\1_ai-model\resume_scanner\frontend\src\assets\vite.svg

@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+python-multipart
+llama-parse
+nest-asyncio
+gliner
+transformers
+sentencepiece
+# Image OCR support (fallback when LlamaParse returns empty for image uploads)
+pytesseract
+Pillow
+# Evaluator Agent (Bot 4 — Phi-3.5 LoRA adapter)
+peft
+accelerate
+bitsandbytes
+groq
+python-dotenv

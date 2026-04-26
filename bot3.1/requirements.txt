@@ -1,0 +1,9 @@
+torch
+torchvision
+torchaudio
+transformers
+datasets
+tokenizers
+numpy
+matplotlib
+tqdm
