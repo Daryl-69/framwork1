@@ -336,16 +336,64 @@ def evaluate_resume(jd_text: str, candidate_json: dict) -> dict:
     """
     print("[INFO] Running evaluator agent …")
 
-    # 1. Try fine-tuned model
+    # 1. Try fine-tuned local model (GPU required)
     result = _run_evaluator_model(jd_text, candidate_json)
     if result is not None:
         print("[INFO] Evaluator model produced valid scorecard.")
         return _validate_scorecard(result)
 
-    # 2. Last resort: return empty scorecard
-    print("[WARN] Evaluator model unavailable or output invalid — returning empty scorecard.")
+    # 2. Fallback: Groq API (works on cloud / no-GPU deployments)
+    result = _run_groq_fallback(jd_text, candidate_json)
+    if result is not None:
+        print("[INFO] Groq API fallback produced valid scorecard.")
+        return _validate_scorecard(result)
+
+    # 3. Last resort: return empty scorecard
+    print("[WARN] All evaluator backends failed — returning empty scorecard.")
     return {
         "scorecard": [],
         "overall_score": 0,
         "recommendation": "No Match",
     }
+
+
+def _run_groq_fallback(jd_text: str, candidate_json: dict) -> Optional[dict]:
+    """
+    Fallback evaluator using Groq Llama 3.3 70B API.
+    Used when the local Phi-3.5 model is unavailable (e.g. cloud deployment, no GPU).
+    """
+    groq_key = os.environ.get("GROQ_API_KEY", "")
+    if not groq_key:
+        print("[WARN] GROQ_API_KEY not set — skipping Groq fallback.")
+        return None
+
+    try:
+        from groq import Groq
+
+        candidate_str = json.dumps(candidate_json, indent=2)
+        prompt = (
+            f"Job Description:\n{jd_text}\n\n"
+            f"Candidate JSON Profile:\n{candidate_str}\n\n"
+            "Return ONLY a valid JSON object with these fields:\n"
+            '{"scorecard": [{"skill": "...", "score": 0-10, "justification": "2 sentences"}], '
+            '"overall_score": float, "recommendation": "Strong Match|Moderate Match|Weak Match|No Match"}'
+        )
+
+        client = Groq(api_key=groq_key)
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.3,
+            max_tokens=1500,
+        )
+
+        raw = response.choices[0].message.content.strip()
+        print(f"[INFO] Groq fallback raw (first 300 chars): {raw[:300]}")
+        return _parse_scorecard_json(raw)
+
+    except Exception as e:
+        print(f"[WARN] Groq fallback failed: {e}")
+        return None
