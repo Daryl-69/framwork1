@@ -1,9 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import './index.css';
 
-// Backend URL: defaults to localhost for dev, override via VITE_API_URL for production
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-
 // ── Debounce hook ─────────────────────────────────────────────
 function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -43,7 +40,7 @@ function App() {
     if (!debouncedRole.trim() || debouncedRole.trim().length < 3) return;
     let cancelled = false;
     setIsFetchingSkills(true);
-    fetch(`${API_BASE}/api/suggest-skills`, {
+    fetch('http://localhost:8000/api/suggest-skills', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ role_title: debouncedRole.trim() }),
@@ -139,7 +136,7 @@ function App() {
     formData.append('file', file);
 
     try {
-      const response = await fetch(`${API_BASE}/api/scan-resume`, {
+      const response = await fetch('http://localhost:8000/api/scan-resume', {
         method: 'POST',
         body: formData,
       });
@@ -174,7 +171,7 @@ function App() {
     setEvaluation(null);
 
     try {
-      const response = await fetch(`${API_BASE}/api/evaluate`, {
+      const response = await fetch('http://localhost:8000/api/evaluate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

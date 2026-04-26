@@ -24,7 +24,6 @@ node_modules/
 *.swo
 *~
 .agents/
-.virtual_documents/
 
 # ─── OS ───────────────────────────────────────────────────
 Thumbs.db
